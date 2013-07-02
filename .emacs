@@ -8,6 +8,7 @@
 (global-unset-key [?\C-l])
 (global-set-key [?\C-l] 'scroll-point-to-top)
 
+
 ;; column-number-mode
 (column-number-mode 1)
 

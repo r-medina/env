@@ -6,7 +6,7 @@ if diff ./.emacs ../.emacs >/dev/null ; then
 else
     cp ../.emacs . 
     date >> log
-    git add .emacs
-    git commit -m "committing changes to .emacs" > /dev/null
-    git push -u origin master > /dev/null
+    cd ~/env/ && git add .emacs
+    git commit -m "committing changes to .emacs"
+    git push -u origin master
 fi

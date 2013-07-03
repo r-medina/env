@@ -43,6 +43,9 @@
 ;; actually reload it
 (global-set-key "\C-c\C-r" 'reload-file)
 
+;; no tabs
+(setq tab-width 8)
+(setq-default indent-tabs-mode nil)
 
 ;; buffer navigation
 (global-unset-key (kbd "C-n"))
@@ -64,8 +67,3 @@
     (css-mode "<style +type=\"text/css\"[^>]*>" "</style>")))
 (setq mweb-filename-extensions '("php" "htm" "html" "ctp" "phtml" "php4" "php5"))
 (multi-web-global-mode 1)
-
-
-;; no tabs
-(setq tab-width 8)
-(setq-default indent-tabs-mode nil)

@@ -23,12 +23,6 @@
 	       "http://marmalade-repo.org/packages/"))
 (package-initialize)
 
-;; how big tabs are
-(setq-default standard-indent 8)
-
-;; tabs
-(setq-default indent-tabs-mode t)
-
 ;; linum mode!
 (global-linum-mode t)
 
@@ -44,8 +38,15 @@
 (global-set-key "\C-c\C-r" 'reload-file)
 
 ;; no tabs
-(setq tab-width 8)
+(setq tab-width 2)
 (setq-default indent-tabs-mode nil)
+
+;; how big tabs are
+(setq-default standard-indent 2)
+
+;; Python Hook
+(add-hook 'python-mode-hook '(lambda () 
+                               (setq python-indent 2)))
 
 ;; buffer navigation
 (global-unset-key (kbd "C-n"))

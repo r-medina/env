@@ -38,15 +38,23 @@
 (global-set-key "\C-c\C-r" 'reload-file)
 
 ;; no tabs
-(setq tab-width 2)
-(setq-default indent-tabs-mode nil)
+;;(setq tab-width 2)
+;;(setq-default indent-tabs-mode nil)
 
 ;; how big tabs are
-(setq-default standard-indent 2)
+;;(setq-default standard-indent 4)
 
 ;; Python Hook
-(add-hook 'python-mode-hook '(lambda () 
-                               (setq python-indent 2)))
+;;(add-hook 'python-mode-hook '(lambda () 
+;;                               (setq python-indent 2)))
+(add-hook 'python-mode-hook
+  (lambda () (setq indent-tabs-mode t)))
+
+(add-hook 'javascript-mode-hook
+  (lambda () (setq indent-tabs-mode t)))
+
+(add-hook 'html-mode-hook
+  (lambda () (setq indent-tabs-mode t)))
 
 ;; buffer navigation
 (global-unset-key (kbd "C-n"))
@@ -68,3 +76,7 @@
     (css-mode "<style +type=\"text/css\"[^>]*>" "</style>")))
 (setq mweb-filename-extensions '("php" "htm" "html" "ctp" "phtml" "php4" "php5"))
 (multi-web-global-mode 1)
+
+
+;; auctex
+(require 'tex-site)

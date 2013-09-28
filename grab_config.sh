@@ -1,5 +1,5 @@
 #!/bin/bash 
-#cron job for checking .emacs file and commiting to repository
+# cron job for checking changes and committing repo
 
 cd ~/env
 

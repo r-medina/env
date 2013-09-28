@@ -1,12 +1,13 @@
 #!/bin/bash 
 #cron job for checking .emacs file and commiting to repository
 
-if diff ./.emacs ../.emacs >/dev/null ; then
+cd ~/env
+
+if ! git status -s #>/dev/null
+then
     :
 else
-    cp ../.emacs . 
-    date >> log
-    cd ~/env/ && git add .emacs
-    git commit -m "committing changes to .emacs"
+    git add .
+    git commit -m "auto message: committing changes to config files"
     git push -u origin master
 fi

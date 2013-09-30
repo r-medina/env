@@ -51,8 +51,6 @@
 
 ;; for python and scheme auto-complete
 (require 'auto-complete)
-
-;; racket shit
 (require 'scheme-complete)
 
 ;; markdown mode
@@ -71,7 +69,9 @@
 
 ;; scheme auto complete
 (add-hook 'scheme-mode-hook 'auto-complete-mode)
-(autoload 'quack "scheme-mode"
+
+;; racket shit
+(autoload 'scheme-mode "quack"
   "Major mode for editing Racket files" t)
 (add-to-list 'auto-mode-alist '("\\.rkt\\'" . scheme-mode))
 
@@ -181,7 +181,7 @@
 ;; open .bashrc
 (global-set-key (kbd "C-c . b") (lambda() (interactive)(find-file "~/.bashrc")))
 ;; open .profile
-(global-set-key (kbd "C-c . b") (lambda() (interactive)(find-file "~/.profile")))
+(global-set-key (kbd "C-c . p") (lambda() (interactive)(find-file "~/.profile")))
 ;; open shell
 (global-set-key (kbd "C-c s") 'shell)
 
@@ -195,27 +195,21 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
+ '(erc-nick "rxaxm")
+ '(erc-port 6667)
+ '(erc-server "irc.freenode.net"))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(rainbow-delimiters-depth-1-face
-   ((t (:foreground "#707183" :weight extra-bold))))
- '(rainbow-delimiters-depth-2-face
-   ((t (:foreground "#7388d6" :weight extra-bold))))
- '(rainbow-delimiters-depth-3-face
-   ((t (:foreground "#909183" :weight extra-bold))))
- '(rainbow-delimiters-depth-4-face
-   ((t (:foreground "#709870" :weight extra-bold))))
- '(rainbow-delimiters-depth-5-face
-   ((t (:foreground "#907373" :weight extra-bold))))
- '(rainbow-delimiters-depth-6-face
-   ((t (:foreground "#6276ba" :weight extra-bold))))
- '(rainbow-delimiters-depth-7-face
-   ((t (:foreground "#858580" :weight extra-bold))))
- '(rainbow-delimiters-depth-8-face
-   ((t (:foreground "#80a880" :weight extra-bold))))
- '(rainbow-delimiters-depth-9-face
-   ((t (:foreground "#887070" :weight extra-bold)))))
+ '(rainbow-delimiters-depth-1-face ((t (:foreground "#707183" :weight extra-bold))))
+ '(rainbow-delimiters-depth-2-face ((t (:foreground "#7388d6" :weight extra-bold))))
+ '(rainbow-delimiters-depth-3-face ((t (:foreground "#909183" :weight extra-bold))))
+ '(rainbow-delimiters-depth-4-face ((t (:foreground "#709870" :weight extra-bold))))
+ '(rainbow-delimiters-depth-5-face ((t (:foreground "#907373" :weight extra-bold))))
+ '(rainbow-delimiters-depth-6-face ((t (:foreground "#6276ba" :weight extra-bold))))
+ '(rainbow-delimiters-depth-7-face ((t (:foreground "#858580" :weight extra-bold))))
+ '(rainbow-delimiters-depth-8-face ((t (:foreground "#80a880" :weight extra-bold))))
+ '(rainbow-delimiters-depth-9-face ((t (:foreground "#887070" :weight extra-bold)))))
+

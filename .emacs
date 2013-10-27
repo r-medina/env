@@ -92,6 +92,9 @@
 (if after-init-time (sml/setup)
   (add-hook 'after-init-hook 'sml/setup))
 
+;; highlight line
+(global-hl-line-mode t)
+
 ;; linum mode!
 (global-linum-mode t)
 
@@ -116,10 +119,14 @@
 (setq scroll-conservatively 10000)
 (setq auto-window-vscroll nil)
 
+;; visual switching
+(require 'switch-window)
+
 
 ;;; IV.  Key bindings
 
 ;; buffer navigation
+(global-set-key (kbd "C-x o") 'switch-window)
 (global-unset-key (kbd "C-n"))
 (global-set-key (kbd "C-n o") 'windmove-up)
 (global-set-key (kbd "C-n l") 'windmove-down)
@@ -195,9 +202,9 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(erc-nick "rxaxm")
- '(erc-port 6667)
- '(erc-server "irc.freenode.net"))
+ '(quack-programs
+   (quote
+    ("mzscheme" "bigloo" "csi" "csi -hygienic" "gosh" "gracket" "gsi" "gsi ~~/syntax-case.scm -" "guile" "kawa" "mit-scheme" "racket" "racket -il typed/racket" "rs" "scheme" "scheme48" "scsh" "sisc" "stklos" "sxi"))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -212,4 +219,3 @@
  '(rainbow-delimiters-depth-7-face ((t (:foreground "#858580" :weight extra-bold))))
  '(rainbow-delimiters-depth-8-face ((t (:foreground "#80a880" :weight extra-bold))))
  '(rainbow-delimiters-depth-9-face ((t (:foreground "#887070" :weight extra-bold)))))
-

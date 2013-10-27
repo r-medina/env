@@ -168,7 +168,7 @@ fi
 # ie: if there's a daemon and a frame
 # if true, it opens a new emacs frame with the file
 # did this because i only use emacs in terminal and dont want
-# emacsclient a_file to open file in an open frame
+# emacsclient <file_name> to open file in an open frame
 function emacssmart {
     if [ "$(pgrep emacs | wc -l)" -gt 1 ]
     then
@@ -176,9 +176,8 @@ function emacssmart {
     elif [[ ! $(pgrep emacs) ]]
     then
 	\emacs --daemon
-    else
-	emacsclient $1
     fi
+    emacsclient $1
 }
 
 alias emacs='emacssmart'

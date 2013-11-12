@@ -173,7 +173,8 @@ function emacssmart {
     fi
 }
 
-if [ ! $(pgrep emacs) ]
+# launches emacs on new window
+if [[ ! $(pgrep emacs) ]]
 then
     emacssmart
 fi

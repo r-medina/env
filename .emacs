@@ -51,14 +51,14 @@
 
 ;; auctex
 ;; something in tex-site is fucking up some of my keybindings
-;; (require 'tex-site)
-;; (setq TeX-PDF-mode t)
-;; (setq TeX-auto-save t)
-;; (setq TeX-parse-self t)
-;; (setq-default TeX-master nil)
-;; (add-hook 'LaTeX-mode-hook 'visual-line-mode)
-;; (add-hook 'LaTeX-mode-hook 'flyspell-mode)
-;; (add-hook 'LaTeX-mode-hook 'LaTeX-math-mode)
+(require 'tex-site)
+(setq TeX-PDF-mode t)
+(setq TeX-auto-save t)
+(setq TeX-parse-self t)
+(setq-default TeX-master nil)
+(add-hook 'LaTeX-mode-hook 'visual-line-mode)
+(add-hook 'LaTeX-mode-hook 'flyspell-mode)
+(add-hook 'LaTeX-mode-hook 'LaTeX-math-mode)
 
 ;; for python and scheme auto-complete
 (require 'auto-complete)
@@ -77,6 +77,7 @@
 ;; python auto-complete
 (add-hook 'jedi-mode-hook 'auto-complete-mode)
 (add-hook 'python-mode-hook 'jedi:setup)
+;; (add-hook 'python-mode-hook 'auto-complete-mode)
 
 ;; scheme auto complete
 (add-hook 'scheme-mode-hook 'auto-complete-mode)
@@ -132,6 +133,7 @@
 
 ;; turn on stripe-buffer-mode
 (add-hook 'find-file-hook 'stripe-buffer-mode)
+(add-hook 'dired-mode-hook 'stripe-listify-buffer)
 
 ;; show matching parenthesis
 (show-paren-mode t)

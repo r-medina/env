@@ -32,12 +32,15 @@
 
 (setq ispell-program-name "aspell")
 
+;; for kil-ring integration with clipboard
+(require 'pbcopy)
+(turn-on-pbcopy)
+
+
 ;;; II.  Programming/Modes
 
+;; no tabs
 (setq-default indent-tabs-mode nil)
-
-;; (require 'web-mode)
-;; (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
 
 ;; for multiple web languages
 (require 'multi-web-mode)
@@ -171,29 +174,17 @@
 (setq auto-window-vscroll nil)
 
 ;; visual switching
+;; randomly decided to stop working
 (require 'switch-window)
 
 
 ;;; IV.  Key bindings
-
-;; buffer navigation
-(global-unset-key (kbd "C-x o"))
-(global-set-key (kbd "C-x o") 'switch-window)
-(global-unset-key (kbd "C-n"))
-(global-set-key (kbd "C-n o") 'windmove-up)
-(global-set-key (kbd "C-n l") 'windmove-down)
-(global-set-key (kbd "C-n j") 'windmove-left)
-(global-set-key (kbd "C-n k") 'windmove-right)
-(setq windmove-wrap-around t)
 
  ;; defines scrolling to top
 (defun scroll-point-to-top ()
   "Defines a function that emulates C-u 0 C-l (C-l = recenter)"
   (interactive)
   (recenter 0))
-;; use C-l to scroll to top
-(global-unset-key (kbd "C-l"))
-(global-set-key (kbd "C-l") 'scroll-point-to-top)
 
 ;; how to relead file
 (defun reload-file ()
@@ -202,27 +193,49 @@
     (find-file (buffer-name))
     (set-window-vscroll nil curr-scroll)
     (message "Reloaded file")))
+
+;; ibuffer
+(global-unset-key (kbd "C-x C-b"))
+(global-set-key (kbd "C-x C-b") 'ibuffer)
+
+;; defining a minor mode for all my keys!!
+;; stolen from: http://stackoverflow.com/questions/683425/globally-override-key-binding-in-emacs
+(defvar my-keys-minor-mode-map (make-keymap) "my-keys-minor-mode keymap.")
+
+;; buffer navigation
+(global-unset-key (kbd "C-n"))
+(define-key my-keys-minor-mode-map (kbd "C-n o") 'windmove-up)
+(define-key my-keys-minor-mode-map (kbd "C-n l") 'windmove-down)
+(define-key my-keys-minor-mode-map (kbd "C-n j") 'windmove-left)
+(define-key my-keys-minor-mode-map (kbd "C-n k") 'windmove-right)
+(setq windmove-wrap-around t)
+
+;; use C-l to scroll to top
+(global-unset-key (kbd "C-l"))
+(define-key my-keys-minor-mode-map (kbd "C-l") 'scroll-point-to-top)
+
 ;; actually reload it
-(global-set-key (kbd "C-c C-r") 'reload-file)
+(define-key my-keys-minor-mode-map (kbd "C-c C-r") 'reload-file)
 
 ;(global-unset-key (kbd "C-q"))
 (global-unset-key (kbd "C-t"))
-(global-set-key (kbd "C-t") 'comment-or-uncomment-region)
+(define-key my-keys-minor-mode-map (kbd "C-t") 'comment-or-uncomment-region)
 (global-unset-key (kbd "C-u"))
-(global-set-key (kbd "C-u") 'magit-status)
+(define-key my-keys-minor-mode-map (kbd "C-u") 'magit-status)
 ;(global-unset-key (kbd "C-f"))
 ;(global-unset-key (kbd "C-b"))
 
 ;; quick minor modes
 (global-unset-key (kbd "M-m"))
-(global-set-key (kbd "M-m w") 'whitespace-mode)
-(global-set-key (kbd "M-m s") 'stripe-buffer-mode)
-(global-set-key (kbd "M-m l") 'linum-mode)
-(global-set-key (kbd "M-m p") 'paredit-mode)
-(global-set-key (kbd "M-m o") 'outline-minor-mode)
+(define-key my-keys-minor-mode-map (kbd "M-m w") 'whitespace-mode)
+(define-key my-keys-minor-mode-map (kbd "M-m s") 'stripe-buffer-mode)
+(define-key my-keys-minor-mode-map (kbd "M-m l") 'linum-mode)
+(define-key my-keys-minor-mode-map (kbd "M-m p") 'paredit-mode)
+(define-key my-keys-minor-mode-map (kbd "M-m o") 'outline-minor-mode)
 
 ;; paredit wrap sexp in square bracket
-;; (define-key paredit-mode-map (kbd "M-[") 'paredit-wrap-square)
+(require 'paredit)
+(define-key paredit-mode-map (kbd "M-[") 'paredit-wrap-square)
 
 ;; Outline-minor-mode key map
 ;(define-prefix-command 'cm-map nil "Outline-")
@@ -232,27 +245,28 @@
 (define-key outline-mode-map (kbd "a") 'show-all)
 (define-key outline-mode-map (kbd "c") 'hide-entry)
 (define-key outline-mode-map (kbd "e") 'show-entry)
-(global-set-key (kbd "C-o") outline-mode-map)
+(define-key my-keys-minor-mode-map (kbd "C-o") outline-mode-map)
 
 ;; jump to word starting with PREFIX
 (global-unset-key (kbd "C-j"))
-(global-set-key (kbd "C-j") 'ace-jump-mode)
+(define-key my-keys-minor-mode-map (kbd "C-j") 'ace-jump-mode)
 
 ;; listing packages
-(global-set-key (kbd "M-p M-l ") 'package-list-packages)
-
-;; ibuffer
-(global-unset-key (kbd "C-x C-b"))
-(global-set-key (kbd "C-x C-b") 'ibuffer)
+(define-key my-keys-minor-mode-map (kbd "M-p M-l ") 'package-list-packages)
 
 ;; open .emacs
-(global-set-key (kbd "C-c . e") (lambda() (interactive)(find-file "~/.emacs")))
+(define-key my-keys-minor-mode-map (kbd "C-c . e") (lambda() (interactive)(find-file "~/.emacs")))
 ;; open .bashrc
-(global-set-key (kbd "C-c . b") (lambda() (interactive)(find-file "~/.bashrc")))
+(define-key my-keys-minor-mode-map (kbd "C-c . b") (lambda() (interactive)(find-file "~/.bashrc")))
 ;; open .profile
-(global-set-key (kbd "C-c . p") (lambda() (interactive)(find-file "~/.profile")))
+(define-key my-keys-minor-mode-map (kbd "C-c . p") (lambda() (interactive)(find-file "~/.profile")))
 ;; open shell
-(global-set-key (kbd "C-c s") 'shell)
+(define-key my-keys-minor-mode-map (kbd "C-c s") 'shell)
+
+(define-minor-mode my-keys-minor-mode
+  "A minor mode so that my key settings override annoying major modes."
+  t " my-keys" 'my-keys-minor-mode-map)
+(my-keys-minor-mode 1)
 
 
 ;;; V.
@@ -264,9 +278,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(quack-programs
-   (quote
-    ("mzscheme" "bigloo" "csi" "csi -hygienic" "gosh" "gracket" "gsi" "gsi ~~/syntax-case.scm -" "guile" "kawa" "mit-scheme" "racket" "racket -il typed/racket" "rs" "scheme" "scheme48" "scsh" "sisc" "stklos" "sxi"))))
+ '(quack-programs (quote ("mzscheme" "bigloo" "csi" "csi -hygienic" "gosh" "gracket" "gsi" "gsi ~~/syntax-case.scm -" "guile" "kawa" "mit-scheme" "racket" "racket -il typed/racket" "rs" "scheme" "scheme48" "scsh" "sisc" "stklos" "sxi"))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

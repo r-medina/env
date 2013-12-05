@@ -21,8 +21,9 @@
 ;; add the user-contributed repository
 (require 'package)
 (add-to-list 'package-archives 
-	     '("marmalade" .
-	       "http://marmalade-repo.org/packages/"))
+	     '("marmalade" . "http://marmalade-repo.org/packages/"))
+(add-to-list 'package-archives 
+	     '("melpa" . "http://melpa.milkbox.net/packages/"))
 (package-initialize)
 
 ;; utf-8 for correct behavior in terminal
@@ -32,9 +33,18 @@
 
 (setq ispell-program-name "aspell")
 
-;; for kil-ring integration with clipboard
+;; better buffer naming behavior
+(require 'uniquify)
+
+;; for kill-ring integration with clipboard
 (require 'pbcopy)
 (turn-on-pbcopy)
+
+;; for editing the browser
+;; (when (and (require 'edit-server nil t) (daemonp))
+;;   (edit-server-start))
+
+(setq winner-mode t)
 
 
 ;;; II.  Programming/Modes
@@ -232,6 +242,7 @@
 (define-key my-keys-minor-mode-map (kbd "M-m l") 'linum-mode)
 (define-key my-keys-minor-mode-map (kbd "M-m p") 'paredit-mode)
 (define-key my-keys-minor-mode-map (kbd "M-m o") 'outline-minor-mode)
+(define-key my-keys-minor-mode-map (kbd "M-m d") 'delete-selection-mode)
 
 ;; paredit wrap sexp in square bracket
 (require 'paredit)
@@ -252,7 +263,7 @@
 (define-key my-keys-minor-mode-map (kbd "C-j") 'ace-jump-mode)
 
 ;; listing packages
-(define-key my-keys-minor-mode-map (kbd "M-p M-l ") 'package-list-packages)
+(define-key my-keys-minor-mode-map (kbd "M-P") 'package-list-packages)
 
 ;; open .emacs
 (define-key my-keys-minor-mode-map (kbd "C-c . e") (lambda() (interactive)(find-file "~/.emacs")))
@@ -278,7 +289,10 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(quack-programs (quote ("mzscheme" "bigloo" "csi" "csi -hygienic" "gosh" "gracket" "gsi" "gsi ~~/syntax-case.scm -" "guile" "kawa" "mit-scheme" "racket" "racket -il typed/racket" "rs" "scheme" "scheme48" "scsh" "sisc" "stklos" "sxi"))))
+ '(blink-cursor-delay 0.1)
+ '(blink-cursor-interval 0.1)
+ '(quack-programs (quote ("mzscheme" "bigloo" "csi" "csi -hygienic" "gosh" "gracket" "gsi" "gsi ~~/syntax-case.scm -" "guile" "kawa" "mit-scheme" "racket" "racket -il typed/racket" "rs" "scheme" "scheme48" "scsh" "sisc" "stklos" "sxi")))
+ '(uniquify-buffer-name-style (quote reverse) nil (uniquify)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

@@ -6,7 +6,7 @@
 ;; ricky.medina91@gmail.com
 
 
-;;; I.   Essentials
+;;; I.  Essentials
 
 ;; common lisp
 (require 'cl)
@@ -44,20 +44,22 @@
 ;; (when (and (require 'edit-server nil t) (daemonp))
 ;;   (edit-server-start))
 
+;; for undo with window operations
 (setq winner-mode t)
 
 
 ;;; II.  Programming/Modes
 
 ;; no tabs
-(setq-default indent-tabs-mode nil)
+;; (setq-default indent-tabs-mode nil)
+(setq-default indent-tabs-mode t)
 
 ;; for multiple web languages
 (require 'multi-web-mode)
 (setq mweb-default-major-mode 'html-mode)
 (setq mweb-tags 
   '((php-mode "<\\?php\\|<\\? \\|<\\?=" "\\?>")
-    (js-mode  "<script +\\(type=\"text/javascript\"\\|language=\"javascript\"\\)[^>]*>" "</script>")
+    (javascript-mode  "<script +\\(type=\"text/javascript\"\\|language=\"javascript\"\\)[^>]*>" "</script>")
     (css-mode "<style +type=\"text/css\"[^>]*>" "</style>")))
 (setq mweb-filename-extensions '("php" "htm" "html" "ctp" "phtml" "php4" "php5"))
 (multi-web-global-mode t)
@@ -95,6 +97,15 @@
 ;; scheme auto complete
 (add-hook 'scheme-mode-hook 'auto-complete-mode)
 
+(autoload 'enable-paredit-mode "paredit" "Turn on pseudo-structural editing of Lisp code." t)
+    (add-hook 'emacs-lisp-mode-hook       #'enable-paredit-mode)
+    (add-hook 'eval-expression-minibuffer-setup-hook #'enable-paredit-mode)
+    (add-hook 'ielm-mode-hook             #'enable-paredit-mode)
+    (add-hook 'lisp-mode-hook             #'enable-paredit-mode)
+    (add-hook 'lisp-interaction-mode-hook #'enable-paredit-mode)
+    (add-hook 'scheme-mode-hook           #'enable-paredit-mode)
+    (add-hook 'javascript-mode-hook       #'enable-paredit-mode)
+
 ;; racket shit
 (autoload 'scheme-mode "quack"
   "Major mode for editing Racket files" t)
@@ -105,7 +116,7 @@
 (setq scss-compile-at-save nil)
 
 ;; javascript indent
-(setq js-indent-level 2)
+(setq js-indent-level 4)
 
 ;; pyret
 (ignore-errors
@@ -132,21 +143,51 @@
       (iter '(lambda (mod) (push (car mod) candidates)) (ocaml-module-alist)))
     candidates))
 
+;; auto-complete for ocaml
 (ac-define-source ocaml
   '((available . (require 'caml-help nil t))
     (candidates . (ac-ocaml-candidates ac-prefix))
     (prefix . "\\(?:[^A-Za-z0-9_.']\\|\\`\\)\\(\\(?:[A-Za-z_][A-Za-z0-9_']*[.]\\)?[A-Za-z0-9_']*\\)")
     (symbol . "s")))
 
+;; smarter tabs for buzzfeed js
+;; (autoload 'smart-tabs-mode "smart-tabs-mode"
+;;    "Intelligently indent with tabs, align with spaces!")
+;; (autoload 'smart-tabs-mode-enable "smart-tabs-mode")
+;; (autoload 'smart-tabs-advice "smart-tabs-mode")
+;; (autoload 'smart-tabs-insinuate "smart-tabs-mode")
+;; (smart-tabs-insinuate 'javascript)
+
+;; js2-mode for better javascript shiz
+;; (add-hook 'js-mode-hook 'smart-tabs-mode)
+(add-hook 'js-mode-hook 'js2-minor-mode)
+(add-to-list 'interpreter-mode-alist '("node" . js2-mode))
+
+;; struggling with tabs
+(setq default-tab-width 4)
+
+;; cperl-mode is preferred to perl-mode                                        
+(defalias 'perl-mode 'cperl-mode)
+(setq cperl-indent-level 4)
+
+;; perl auto complete?
+(add-hook 'cperl-mode-hook
+          (lambda()
+            (require 'perl-completion)
+            (perl-completion-mode t)))
+(add-hook  'cperl-mode-hook
+           (lambda ()
+             (when (require 'auto-complete nil t) 
+               (auto-complete-mode t)
+               (make-variable-buffer-local 'ac-sources)
+               (setq ac-sources
+                     '(ac-source-perl-completion)))))
+
 
 ;;; III. Look
 
 ;; column-number-mode
 (column-number-mode t)
-
-;; turn on stripe-buffer-mode
-(add-hook 'find-file-hook 'stripe-buffer-mode)
-(add-hook 'dired-mode-hook 'stripe-listify-buffer)
 
 ;; show matching parenthesis
 (show-paren-mode t)
@@ -156,11 +197,11 @@
 (if after-init-time (sml/setup)
   (add-hook 'after-init-hook 'sml/setup))
 
-;; highlight line
-;;(global-hl-line-mode t)
-
 ;; linum mode!
 (global-linum-mode t)
+
+;; outline mode
+(add-hook 'find-file-hook 'outline-minor-mode)
 
 ;; for better linum mode formatting
 (defvar my-linum-format-string "%4d")
@@ -185,7 +226,16 @@
 
 ;; visual switching
 ;; randomly decided to stop working
-(require 'switch-window)
+;; (require 'switch-window)
+
+;; not very good
+;; make it do what ace-jump-mode does instead ie just text
+;; (auto-dim-other-buffers-mode t)
+
+;; turn on stripe-buffer-mode
+(add-hook 'stripe-buffer-mode-hook 'hl-line-mode)
+(add-hook 'dired-mode-hook 'stripe-listify-buffer)
+(add-hook 'find-file-hook 'stripe-buffer-mode)
 
 
 ;;; IV.  Key bindings
@@ -243,13 +293,13 @@
 (define-key my-keys-minor-mode-map (kbd "M-m p") 'paredit-mode)
 (define-key my-keys-minor-mode-map (kbd "M-m o") 'outline-minor-mode)
 (define-key my-keys-minor-mode-map (kbd "M-m d") 'delete-selection-mode)
+(define-key my-keys-minor-mode-map (kbd "M-m a") 'auto-complete-mode)
 
 ;; paredit wrap sexp in square bracket
 (require 'paredit)
 (define-key paredit-mode-map (kbd "M-[") 'paredit-wrap-square)
 
 ;; Outline-minor-mode key map
-;(define-prefix-command 'cm-map nil "Outline-")
 (define-prefix-command 'outline-mode-map)
 (define-key outline-mode-map (kbd "h") 'hide-sublevels)
 (define-key outline-mode-map (kbd "b") 'hide-body)
@@ -266,18 +316,25 @@
 (define-key my-keys-minor-mode-map (kbd "M-P") 'package-list-packages)
 
 ;; open .emacs
-(define-key my-keys-minor-mode-map (kbd "C-c . e") (lambda() (interactive)(find-file "~/.emacs")))
+(define-key my-keys-minor-mode-map (kbd "C-c . e")
+  (lambda() (interactive)(find-file "~/.emacs")))
 ;; open .bashrc
-(define-key my-keys-minor-mode-map (kbd "C-c . b") (lambda() (interactive)(find-file "~/.bashrc")))
+(define-key my-keys-minor-mode-map (kbd "C-c . b")
+  (lambda() (interactive)(find-file "~/.bashrc")))
 ;; open .profile
-(define-key my-keys-minor-mode-map (kbd "C-c . p") (lambda() (interactive)(find-file "~/.profile")))
+(define-key my-keys-minor-mode-map (kbd "C-c . p")
+  (lambda() (interactive)(find-file "~/.profile")))
 ;; open shell
 (define-key my-keys-minor-mode-map (kbd "C-c s") 'shell)
 
+;; personal minor mode for key map. GREAT hack
 (define-minor-mode my-keys-minor-mode
   "A minor mode so that my key settings override annoying major modes."
   t " my-keys" 'my-keys-minor-mode-map)
 (my-keys-minor-mode 1)
+
+;; toggle my minor mode
+(global-set-key (kbd "M-m m") 'my-keys-minor-mode)
 
 
 ;;; V.
@@ -291,7 +348,8 @@
  ;; If there is more than one, they won't work right.
  '(blink-cursor-delay 0.1)
  '(blink-cursor-interval 0.1)
- '(quack-programs (quote ("mzscheme" "bigloo" "csi" "csi -hygienic" "gosh" "gracket" "gsi" "gsi ~~/syntax-case.scm -" "guile" "kawa" "mit-scheme" "racket" "racket -il typed/racket" "rs" "scheme" "scheme48" "scsh" "sisc" "stklos" "sxi")))
+ '(fill-column 85)
+ '(quack-programs (quote ("." "bigloo" "csi" "csi -hygienic" "drracket" "gosh" "gracket" "gsi" "gsi ~~/syntax-case.scm -" "guile" "kawa" "mit-scheme" "mzscheme" "racket" "racket -il typed/racket" "rs" "scheme" "scheme48" "scsh" "sisc" "stklos" "sxi")))
  '(uniquify-buffer-name-style (quote reverse) nil (uniquify)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.

@@ -139,7 +139,7 @@ alias tree='tree -C'
 
 # alias for smart emacs launching function
 alias emacs='emacssmart'
-alias emacskill="emacsclient -e '(kill-emacs)'"
+alias emacskill="emacsclient -e '(kill-emacs)' && echo 'killing emacs'"
 
 # emacssmart checks to see if there is more than one emacs process
 # ie: if there's a daemon and a frame
@@ -154,7 +154,7 @@ function emacssmart {
     then
 	if [ -z "$1" ]
 	then 
-	    \emacs --daemon
+	    \emacs --daemon; emacssmart
 	else
 	    emacssmart; emacssmart $1
 	fi
@@ -164,7 +164,7 @@ function emacssmart {
 # launches emacs on new window
 if [[ ! $(pgrep emacs) ]]
 then
-    emacssmart
+    \emacs --daemon
 fi
 
 # for virtualenv shit

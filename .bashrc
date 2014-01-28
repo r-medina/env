@@ -13,8 +13,9 @@ HISTCONTROL=ignoredups:ignorespace
 shopt -s histappend
 
 # for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
-HISTSIZE=1000
-HISTFILESIZE=2000
+HISTSIZE=100000
+HISTFILESIZE=200000
+export PROMPT_COMMAND='history -a'
 
 # check the window size after each command and, if necessary,
 # update the values of LINES and COLUMNS.
@@ -156,7 +157,7 @@ function emacssmart {
 	then 
 	    \emacs --daemon; emacssmart
 	else
-	    emacssmart; emacssmart $1
+	    \emacs --daemon; emacssmart $1
 	fi
     fi
 }
@@ -177,3 +178,4 @@ eval "$(rbenv init -)"
 
 # git auto complete
 source /usr/local/etc/bash_completion.d/git-completion.bash
+export GOPATH=~/code/go

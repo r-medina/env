@@ -5,6 +5,11 @@
 ;; github.com/r-medina
 ;; ricky.medina91@gmail.com
 
+;; TODO:
+;; - call a lot of the require statements into hooks because they all shouldn't be
+;;   loaded until they're needed
+;; - edit find-file-hook such that it calls auto-complete-mode
+
 
 ;;; I.  Essentials
 
@@ -20,10 +25,10 @@
 
 ;; add the user-contributed repository
 (require 'package)
-(add-to-list 'package-archives 
-	     '("marmalade" . "http://marmalade-repo.org/packages/"))
-(add-to-list 'package-archives 
-	     '("melpa" . "http://melpa.milkbox.net/packages/"))
+(add-to-list 'package-archives
+             '("marmalade" . "http://marmalade-repo.org/packages/"))
+(add-to-list 'package-archives
+             '("melpa" . "http://melpa.milkbox.net/packages/"))
 (package-initialize)
 
 ;; utf-8 for correct behavior in terminal
@@ -40,6 +45,9 @@
 (require 'pbcopy)
 (turn-on-pbcopy)
 
+;; so selections work like in everywhere else
+(delete-selection-mode 1)
+
 ;; for editing the browser
 ;; (when (and (require 'edit-server nil t) (daemonp))
 ;;   (edit-server-start))
@@ -51,21 +59,19 @@
 ;;; II.  Programming/Modes
 
 ;; no tabs
-;; (setq-default indent-tabs-mode nil)
-(setq-default indent-tabs-mode t)
+(setq-default indent-tabs-mode nil)
 
 ;; for multiple web languages
 (require 'multi-web-mode)
 (setq mweb-default-major-mode 'html-mode)
-(setq mweb-tags 
-  '((php-mode "<\\?php\\|<\\? \\|<\\?=" "\\?>")
-    (javascript-mode  "<script +\\(type=\"text/javascript\"\\|language=\"javascript\"\\)[^>]*>" "</script>")
-    (css-mode "<style +type=\"text/css\"[^>]*>" "</style>")))
+(setq mweb-tags
+      '((php-mode "<\\?php\\|<\\? \\|<\\?=" "\\?>")
+        (javascript-mode  "<script +\\(type=\"text/javascript\"\\|language=\"javascript\"\\)[^>]*>" "</script>")
+        (css-mode "<style +type=\"text/css\"[^>]*>" "</style>")))
 (setq mweb-filename-extensions '("php" "htm" "html" "ctp" "phtml" "php4" "php5"))
 (multi-web-global-mode t)
 
 ;; auctex
-;; something in tex-site is fucking up some of my keybindings
 (require 'tex-site)
 (setq TeX-PDF-mode t)
 (setq TeX-auto-save t)
@@ -77,7 +83,6 @@
 
 ;; for python and scheme auto-complete
 (require 'auto-complete)
-(require 'scheme-complete)
 
 ;; markdown mode
 (autoload 'markdown-mode "markdown-mode"
@@ -92,53 +97,53 @@
 ;; python auto-complete
 (add-hook 'jedi-mode-hook 'auto-complete-mode)
 (add-hook 'python-mode-hook 'jedi:setup)
-;; (add-hook 'python-mode-hook 'auto-complete-mode)
 
-;; scheme auto complete
-(add-hook 'scheme-mode-hook 'auto-complete-mode)
-
+;; paredit auto-loads
 (autoload 'enable-paredit-mode "paredit" "Turn on pseudo-structural editing of Lisp code." t)
-    (add-hook 'emacs-lisp-mode-hook       #'enable-paredit-mode)
-    (add-hook 'eval-expression-minibuffer-setup-hook #'enable-paredit-mode)
-    (add-hook 'ielm-mode-hook             #'enable-paredit-mode)
-    (add-hook 'lisp-mode-hook             #'enable-paredit-mode)
-    (add-hook 'lisp-interaction-mode-hook #'enable-paredit-mode)
-    (add-hook 'scheme-mode-hook           #'enable-paredit-mode)
-    (add-hook 'javascript-mode-hook       #'enable-paredit-mode)
+(add-hook 'emacs-lisp-mode-hook       #'enable-paredit-mode)
+(add-hook 'eval-expression-minibuffer-setup-hook #'enable-paredit-mode)
+(add-hook 'ielm-mode-hook             #'enable-paredit-mode)
+(add-hook 'lisp-mode-hook             #'enable-paredit-mode)
+(add-hook 'lisp-interaction-mode-hook #'enable-paredit-mode)
+(add-hook 'scheme-mode-hook           #'enable-paredit-mode)
+(add-hook 'javascript-mode-hook       #'enable-paredit-mode)
+(add-hook 'clojure-mode-hook          #'enable-paredit-mode)
 
 ;; racket shit
 (autoload 'scheme-mode "quack"
   "Major mode for editing Racket files" t)
 (add-to-list 'auto-mode-alist '("\\.rkt\\'" . scheme-mode))
 
+;; scheme auto complete
+(add-hook 'scheme-mode-hook 'auto-complete-mode)
+
 ;; scss
 (add-to-list 'auto-mode-alist '("\\.scss\\'" . scss-mode))
 (setq scss-compile-at-save nil)
 
 ;; javascript indent
-(setq js-indent-level 4)
+(setq js-indent-level 2)
 
 ;; pyret
-(ignore-errors
-  (require 'pyret)
-  (add-to-list 'auto-mode-alist '("\\.arr$" . pyret-mode))
-  (add-to-list 'file-coding-system-alist '("\\.arr\\'" . utf-8)))
+(require 'pyret)
+(add-to-list 'auto-mode-alist '("\\.arr$" . pyret-mode))
+(add-to-list 'file-coding-system-alist '("\\.arr\\'" . utf-8))
 
 ;; ocaml complete
 (add-hook 'tuareg-mode-hook 'auto-complete-mode)
 (defun ac-ocaml-candidates (prefix)
   "Candidates for OCaml auto-completion"
   (let ((candidates)
-        (module-name 
+        (module-name
          (when (string-match "\\([A-Za-z_][A-Za-z0-9_']*\\)[.]" prefix)
-                 (match-string 1 prefix))))
+           (match-string 1 prefix))))
     (if module-name
         (iter '(lambda (sym) (push (concat module-name "." sym) candidates))
               (ocaml-module-symbols (assoc module-name (ocaml-module-alist))))
       (iter
        '(lambda (mod)
-            (iter '(lambda (sym) (push sym candidates))
-                  (ocaml-module-symbols mod)))
+          (iter '(lambda (sym) (push sym candidates))
+                (ocaml-module-symbols mod)))
        (ocaml-visible-modules))
       (iter '(lambda (mod) (push (car mod) candidates)) (ocaml-module-alist)))
     candidates))
@@ -166,9 +171,10 @@
 ;; struggling with tabs
 (setq default-tab-width 4)
 
-;; cperl-mode is preferred to perl-mode                                        
+;; cperl-mode is preferred to perl-mode
 (defalias 'perl-mode 'cperl-mode)
 (setq cperl-indent-level 4)
+(add-to-list 'auto-mode-alist '("\\.t\\'" . cperl-mode))
 
 ;; perl auto complete?
 (add-hook 'cperl-mode-hook
@@ -177,11 +183,21 @@
             (perl-completion-mode t)))
 (add-hook  'cperl-mode-hook
            (lambda ()
-             (when (require 'auto-complete nil t) 
+             (when (require 'auto-complete nil t)
                (auto-complete-mode t)
                (make-variable-buffer-local 'ac-sources)
                (setq ac-sources
                      '(ac-source-perl-completion)))))
+
+;; FIX THIS SOON
+;; Completion words longer than 4 characters
+;; (custom-set-variables
+;;  '(ac-ispell-requires 4))
+;; (eval-after-load "auto-complete"
+;;   '(progn
+;;   (ac-ispell-setup)))
+;; (defun my/enable-ac-ispell ()
+;;   (add-to-list 'ac-sources 'ac-source-ispell))
 
 
 ;;; III. Look
@@ -208,9 +224,9 @@
 (add-hook 'linum-before-numbering-hook 'my-linum-get-format-string)
 (defun my-linum-get-format-string ()
   (let* ((width (length (number-to-string
-			 (count-lines (point-min) (point-max)))))
-	 ;; my own formatting string
-	 (format (concat "%" (number-to-string width) "d\u2502 ")))
+                         (count-lines (point-min) (point-max)))))
+         ;; my own formatting string
+         (format (concat "%" (number-to-string width) "d\u2502 ")))
     (setq my-linum-format-string format)))
 (setq linum-format 'my-linum-format)
 (defun my-linum-format (line-number)
@@ -226,7 +242,7 @@
 
 ;; visual switching
 ;; randomly decided to stop working
-;; (require 'switch-window)
+(require 'switch-window)
 
 ;; not very good
 ;; make it do what ace-jump-mode does instead ie just text
@@ -235,12 +251,12 @@
 ;; turn on stripe-buffer-mode
 (add-hook 'stripe-buffer-mode-hook 'hl-line-mode)
 (add-hook 'dired-mode-hook 'stripe-listify-buffer)
-(add-hook 'find-file-hook 'stripe-buffer-mode)
+;; (add-hook 'find-file-hook 'stripe-buffer-mode)
 
 
 ;;; IV.  Key bindings
 
- ;; defines scrolling to top
+;; defines scrolling to top
 (defun scroll-point-to-top ()
   "Defines a function that emulates C-u 0 C-l (C-l = recenter)"
   (interactive)
@@ -263,41 +279,36 @@
 (defvar my-keys-minor-mode-map (make-keymap) "my-keys-minor-mode keymap.")
 
 ;; buffer navigation
-(global-unset-key (kbd "C-n"))
-(define-key my-keys-minor-mode-map (kbd "C-n o") 'windmove-up)
-(define-key my-keys-minor-mode-map (kbd "C-n l") 'windmove-down)
-(define-key my-keys-minor-mode-map (kbd "C-n j") 'windmove-left)
-(define-key my-keys-minor-mode-map (kbd "C-n k") 'windmove-right)
+(define-prefix-command 'nav-map)
+(define-key nav-map (kbd "o") 'windmove-up)
+(define-key nav-map (kbd "l") 'windmove-down)
+(define-key nav-map (kbd "j") 'windmove-left)
+(define-key nav-map (kbd "k") 'windmove-right)
+(define-key my-keys-minor-mode-map (kbd "C-n") nav-map)
 (setq windmove-wrap-around t)
 
 ;; use C-l to scroll to top
-(global-unset-key (kbd "C-l"))
 (define-key my-keys-minor-mode-map (kbd "C-l") 'scroll-point-to-top)
 
 ;; actually reload it
 (define-key my-keys-minor-mode-map (kbd "C-c C-r") 'reload-file)
 
-;(global-unset-key (kbd "C-q"))
-(global-unset-key (kbd "C-t"))
+                                        ;(global-unset-key (kbd "C-q"))
 (define-key my-keys-minor-mode-map (kbd "C-t") 'comment-or-uncomment-region)
-(global-unset-key (kbd "C-u"))
 (define-key my-keys-minor-mode-map (kbd "C-u") 'magit-status)
-;(global-unset-key (kbd "C-f"))
-;(global-unset-key (kbd "C-b"))
+                                        ;(global-unset-key (kbd "C-f"))
+                                        ;(global-unset-key (kbd "C-b"))
 
 ;; quick minor modes
-(global-unset-key (kbd "M-m"))
-(define-key my-keys-minor-mode-map (kbd "M-m w") 'whitespace-mode)
-(define-key my-keys-minor-mode-map (kbd "M-m s") 'stripe-buffer-mode)
-(define-key my-keys-minor-mode-map (kbd "M-m l") 'linum-mode)
-(define-key my-keys-minor-mode-map (kbd "M-m p") 'paredit-mode)
-(define-key my-keys-minor-mode-map (kbd "M-m o") 'outline-minor-mode)
-(define-key my-keys-minor-mode-map (kbd "M-m d") 'delete-selection-mode)
-(define-key my-keys-minor-mode-map (kbd "M-m a") 'auto-complete-mode)
-
-;; paredit wrap sexp in square bracket
-(require 'paredit)
-(define-key paredit-mode-map (kbd "M-[") 'paredit-wrap-square)
+(define-prefix-command 'quick-modes-map)
+(define-key quick-modes-map (kbd "w") 'whitespace-mode)
+(define-key quick-modes-map (kbd "s") 'stripe-buffer-mode)
+(define-key quick-modes-map (kbd "l") 'linum-mode)
+(define-key quick-modes-map (kbd "p") 'paredit-mode)
+(define-key quick-modes-map (kbd "o") 'outline-minor-mode)
+(define-key quick-modes-map (kbd "d") 'delete-selection-mode)
+(define-key quick-modes-map (kbd "a") 'auto-complete-mode)
+(define-key my-keys-minor-mode-map (kbd "M-m") quick-modes-map)
 
 ;; Outline-minor-mode key map
 (define-prefix-command 'outline-mode-map)
@@ -334,6 +345,7 @@
 (my-keys-minor-mode 1)
 
 ;; toggle my minor mode
+(global-unset-key (kbd "M-m"))
 (global-set-key (kbd "M-m m") 'my-keys-minor-mode)
 
 
@@ -348,6 +360,7 @@
  ;; If there is more than one, they won't work right.
  '(blink-cursor-delay 0.1)
  '(blink-cursor-interval 0.1)
+ '(custom-safe-themes (quote ("96efbabfb6516f7375cdf85e7781fe7b7249b6e8114676d65337a1ffe78b78d9" default)))
  '(fill-column 85)
  '(quack-programs (quote ("." "bigloo" "csi" "csi -hygienic" "drracket" "gosh" "gracket" "gsi" "gsi ~~/syntax-case.scm -" "guile" "kawa" "mit-scheme" "mzscheme" "racket" "racket -il typed/racket" "rs" "scheme" "scheme48" "scsh" "sisc" "stklos" "sxi")))
  '(uniquify-buffer-name-style (quote reverse) nil (uniquify)))
@@ -356,6 +369,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(hl-line ((t (:background "#171538"))))
  '(rainbow-delimiters-depth-1-face ((t (:foreground "#707183" :weight extra-bold))))
  '(rainbow-delimiters-depth-2-face ((t (:foreground "#7388d6" :weight extra-bold))))
  '(rainbow-delimiters-depth-3-face ((t (:foreground "#909183" :weight extra-bold))))
@@ -364,4 +378,5 @@
  '(rainbow-delimiters-depth-6-face ((t (:foreground "#6276ba" :weight extra-bold))))
  '(rainbow-delimiters-depth-7-face ((t (:foreground "#858580" :weight extra-bold))))
  '(rainbow-delimiters-depth-8-face ((t (:foreground "#80a880" :weight extra-bold))))
- '(rainbow-delimiters-depth-9-face ((t (:foreground "#887070" :weight extra-bold)))))
+ '(rainbow-delimiters-depth-9-face ((t (:foreground "#887070" :weight extra-bold))))
+ '(stripe-highlight ((t (:background "#0b0b0b")))))

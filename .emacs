@@ -6,9 +6,10 @@
 ;; ricky.medina91@gmail.com
 
 ;; TODO:
-;; - call a lot of the require statements into hooks because they all shouldn't be
-;;   loaded until they're needed
+;; - move some require statements to autoloads or hooks
 ;; - edit find-file-hook such that it calls auto-complete-mode
+;; - elget
+;; - fix that my-clean leaves some trailing whitespace
 
 
 ;;; I.  Essentials
@@ -58,8 +59,20 @@
 
 ;;; II.  Programming/Modes
 
+;; cleaning shit up
+(defun my-clean ()
+  (interactive)
+  (setq end (point-max))
+  "does some cleaning up of files"
+  (untabify 0 end)
+  (indent-region 0 end)
+  (delete-trailing-whitespace 0 end))
+
 ;; no tabs
 (setq-default indent-tabs-mode nil)
+
+;; struggling with tabs
+(setq default-tab-width 4)
 
 ;; for multiple web languages
 (require 'multi-web-mode)
@@ -83,6 +96,15 @@
 
 ;; for python and scheme auto-complete
 (require 'auto-complete)
+
+;; java stuffs
+(autoload 'malabar-mode "malabar-mode"
+  "Better Java major mode" t)
+(add-to-list 'auto-mode-alist '("\\.java\\'" . malabar-mode))
+(add-hook 'malabar-mode-hook 'auto-complete-mode)
+
+;; scala
+(require 'scala-mode2)
 
 ;; markdown mode
 (autoload 'markdown-mode "markdown-mode"
@@ -124,8 +146,44 @@
 ;; javascript indent
 (setq js-indent-level 2)
 
+;; smarter tabs for buzzfeed js
+;; (autoload 'smart-tabs-mode "smart-tabs-mode"
+;;    "Intelligently indent with tabs, align with spaces!")
+;; (autoload 'smart-tabs-mode-enable "smart-tabs-mode")
+;; (autoload 'smart-tabs-advice "smart-tabs-mode")
+;; (autoload 'smart-tabs-insinuate "smart-tabs-mode")
+;; (smart-tabs-insinuate 'javascript)
+
+;; js2-mode for better javascript shiz
+(add-hook 'js-mode-hook 'js2-minor-mode)
+;; (add-hook 'js-mode-hook 'smart-tabs-mode)
+;; (add-to-list 'interpreter-mode-alist '("node" . js2-mode))
+
+
+;; json parsing
+;; taken from https://code.google.com/p/js2-mode/issues/detail?id=50#c7
+(defadvice js2-reparse (before json)
+  (setq js2-buffer-file-name buffer-file-name))
+(ad-activate 'js2-reparse)
+
+(defadvice js2-parse-statement (around json)
+  (if (and (= tt js2-LC)
+           js2-buffer-file-name
+           (string-equal (substring js2-buffer-file-name -5) ".json")
+           (eq (+ (save-excursion
+                    (goto-char (point-min))
+                    (back-to-indentation)
+                    (while (eolp)
+                      (next-line)
+                      (back-to-indentation))
+                    (point)) 1) js2-ts-cursor))
+      (setq ad-return-value (js2-parse-assign-expr))
+    ad-do-it))
+(ad-activate 'js2-parse-statement)
+
 ;; pyret
-(require 'pyret)
+(autoload 'pryret-mode "pyret"
+  "Pyret language major mode" t)
 (add-to-list 'auto-mode-alist '("\\.arr$" . pyret-mode))
 (add-to-list 'file-coding-system-alist '("\\.arr\\'" . utf-8))
 
@@ -154,22 +212,6 @@
     (candidates . (ac-ocaml-candidates ac-prefix))
     (prefix . "\\(?:[^A-Za-z0-9_.']\\|\\`\\)\\(\\(?:[A-Za-z_][A-Za-z0-9_']*[.]\\)?[A-Za-z0-9_']*\\)")
     (symbol . "s")))
-
-;; smarter tabs for buzzfeed js
-;; (autoload 'smart-tabs-mode "smart-tabs-mode"
-;;    "Intelligently indent with tabs, align with spaces!")
-;; (autoload 'smart-tabs-mode-enable "smart-tabs-mode")
-;; (autoload 'smart-tabs-advice "smart-tabs-mode")
-;; (autoload 'smart-tabs-insinuate "smart-tabs-mode")
-;; (smart-tabs-insinuate 'javascript)
-
-;; js2-mode for better javascript shiz
-;; (add-hook 'js-mode-hook 'smart-tabs-mode)
-(add-hook 'js-mode-hook 'js2-minor-mode)
-(add-to-list 'interpreter-mode-alist '("node" . js2-mode))
-
-;; struggling with tabs
-(setq default-tab-width 4)
 
 ;; cperl-mode is preferred to perl-mode
 (defalias 'perl-mode 'cperl-mode)
@@ -201,6 +243,8 @@
 
 
 ;;; III. Look
+
+(load-theme 'tango-dark t)
 
 ;; column-number-mode
 (column-number-mode t)
@@ -249,8 +293,9 @@
 ;; (auto-dim-other-buffers-mode t)
 
 ;; turn on stripe-buffer-mode
-(add-hook 'stripe-buffer-mode-hook 'hl-line-mode)
 (add-hook 'dired-mode-hook 'stripe-listify-buffer)
+(add-hook 'find-file-hook 'hl-line-mode)
+;; (add-hook 'stripe-buffer-mode-hook 'hl-line-mode)
 ;; (add-hook 'find-file-hook 'stripe-buffer-mode)
 
 
@@ -303,6 +348,7 @@
 (define-prefix-command 'quick-modes-map)
 (define-key quick-modes-map (kbd "w") 'whitespace-mode)
 (define-key quick-modes-map (kbd "s") 'stripe-buffer-mode)
+(define-key quick-modes-map (kbd "r") 'rainbow-delimiters-mode)
 (define-key quick-modes-map (kbd "l") 'linum-mode)
 (define-key quick-modes-map (kbd "p") 'paredit-mode)
 (define-key quick-modes-map (kbd "o") 'outline-minor-mode)
@@ -337,6 +383,8 @@
   (lambda() (interactive)(find-file "~/.profile")))
 ;; open shell
 (define-key my-keys-minor-mode-map (kbd "C-c s") 'shell)
+;; cleaning function
+(define-key my-keys-minor-mode-map (kbd "C-c C") 'my-clean)
 
 ;; personal minor mode for key map. GREAT hack
 (define-minor-mode my-keys-minor-mode
@@ -353,6 +401,7 @@
 
 ;; color matching delimiters
 (global-rainbow-delimiters-mode t)
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -360,7 +409,6 @@
  ;; If there is more than one, they won't work right.
  '(blink-cursor-delay 0.1)
  '(blink-cursor-interval 0.1)
- '(custom-safe-themes (quote ("96efbabfb6516f7375cdf85e7781fe7b7249b6e8114676d65337a1ffe78b78d9" default)))
  '(fill-column 85)
  '(quack-programs (quote ("." "bigloo" "csi" "csi -hygienic" "drracket" "gosh" "gracket" "gsi" "gsi ~~/syntax-case.scm -" "guile" "kawa" "mit-scheme" "mzscheme" "racket" "racket -il typed/racket" "rs" "scheme" "scheme48" "scsh" "sisc" "stklos" "sxi")))
  '(uniquify-buffer-name-style (quote reverse) nil (uniquify)))
@@ -370,13 +418,13 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(hl-line ((t (:background "#171538"))))
- '(rainbow-delimiters-depth-1-face ((t (:foreground "#707183" :weight extra-bold))))
- '(rainbow-delimiters-depth-2-face ((t (:foreground "#7388d6" :weight extra-bold))))
- '(rainbow-delimiters-depth-3-face ((t (:foreground "#909183" :weight extra-bold))))
- '(rainbow-delimiters-depth-4-face ((t (:foreground "#709870" :weight extra-bold))))
- '(rainbow-delimiters-depth-5-face ((t (:foreground "#907373" :weight extra-bold))))
- '(rainbow-delimiters-depth-6-face ((t (:foreground "#6276ba" :weight extra-bold))))
- '(rainbow-delimiters-depth-7-face ((t (:foreground "#858580" :weight extra-bold))))
- '(rainbow-delimiters-depth-8-face ((t (:foreground "#80a880" :weight extra-bold))))
- '(rainbow-delimiters-depth-9-face ((t (:foreground "#887070" :weight extra-bold))))
+ ;; '(rainbow-delimiters-depth-1-face ((t (:foreground "#707183" :weight extra-bold))))
+ ;; '(rainbow-delimiters-depth-2-face ((t (:foreground "#7388d6" :weight extra-bold))))
+ ;; '(rainbow-delimiters-depth-3-face ((t (:foreground "#909183" :weight extra-bold))))
+ ;; '(rainbow-delimiters-depth-4-face ((t (:foreground "#709870" :weight extra-bold))))
+ ;; '(rainbow-delimiters-depth-5-face ((t (:foreground "#907373" :weight extra-bold))))
+ ;; '(rainbow-delimiters-depth-6-face ((t (:foreground "#6276ba" :weight extra-bold))))
+ ;; '(rainbow-delimiters-depth-7-face ((t (:foreground "#858580" :weight extra-bold))))
+ ;; '(rainbow-delimiters-depth-8-face ((t (:foreground "#80a880" :weight extra-bold))))
+ ;; '(rainbow-delimiters-depth-9-face ((t (:foreground "#887070" :weight extra-bold))))
  '(stripe-highlight ((t (:background "#0b0b0b")))))

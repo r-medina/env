@@ -150,15 +150,15 @@ alias emacskill="emacsclient -e '(kill-emacs)' && echo 'killing emacs'"
 function emacssmart {
     if [ "$(pgrep emacs | wc -l)" -ge 1 ]
     then
-	emacsclient -c $1
+	    emacsclient -c $1
     elif [ ! $(pgrep emacs) ]
     then
-	if [ -z "$1" ]
+	    if [ -z "$1" ]
 	then 
-	    \emacs --daemon; emacssmart
-	else
-	    \emacs --daemon; emacssmart $1
-	fi
+	        \emacs --daemon; emacssmart
+	    else
+	        \emacs --daemon; emacssmart $1
+	    fi
     fi
 }
 
@@ -167,6 +167,16 @@ if [[ ! $(pgrep emacs) ]]
 then
     \emacs --daemon
 fi
+
+# make directory, cd in
+function mkcd {
+    if [ -n "$1" ]
+    then
+        mkdir -p $1 && cd $1
+    else
+        echo "usage: mkcd directory"
+    fi
+}
 
 # for virtualenv shit
 source /usr/local/bin/virtualenvwrapper.sh
@@ -179,3 +189,9 @@ eval "$(rbenv init -)"
 # git auto complete
 source /usr/local/etc/bash_completion.d/git-completion.bash
 export GOPATH=~/code/go
+
+# node env
+export NODE_ENV=development
+
+# for searching node packages
+alias ngrep="grep -Hirs --exclude-dir=node_modules --exclude-dir=.build --exclude-dir='./public/components'"

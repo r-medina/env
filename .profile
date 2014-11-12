@@ -24,7 +24,7 @@ then
     # include .bashrc if it exists
     if [ -f "$HOME/.bashrc" ]
     then
-	. "$HOME/.bashrc"
+        . "$HOME/.bashrc"
     fi
 fi
 
@@ -39,7 +39,7 @@ fi
 shopt -s progcomp
 for f in $(command ls ~/.node-completion)
 do
-  f="$HOME/.node-completion/$f"
-  test -f "$f" && . "$f"
+    f="$HOME/.node-completion/$f"
+    test -f "$f" && . "$f"
 done
 # }}}

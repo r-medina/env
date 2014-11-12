@@ -6,39 +6,40 @@
 
 # the default umask is set in /etc/profile; for setting the umask
 # for ssh logins, install and configure the libpam-umask package.
-umask 077
+# umask 077
 
 export EDITOR='emacs'
-
-# if running bash
-if [ -n "$BASH_VERSION" ]; then
-    # include .bashrc if it exists
-    if [ -f "$HOME/.bashrc" ]; then
-	. "$HOME/.bashrc"
-    fi
-fi
 
 # -n returns true if the string is not null
 # -f returns true if the file right after exists
 
-# set PATH so it includes user's private bin if it exists. "Prepends"
-if [ -d "$HOME/bin" ] ; then
-    PATH="$HOME/bin:/usr/local/sbin:$PATH"
+if [ -d "/usr/local/sbin" ]
+then
+    export PATH="/usr/local/sbin:$PATH"
 fi
 
-# add matlab binaries folder to PATH variable
-PATH="/Applications/MATLAB_R2010b.app/bin:$PATH"
+# if running bash
+if [ -n "$BASH_VERSION" ]
+then
+    # include .bashrc if it exists
+    if [ -f "$HOME/.bashrc" ]
+    then
+	. "$HOME/.bashrc"
+    fi
+fi
 
-# add mysql binaries
-#PATH="/usr/local/mysql/bin:$PATH"
+# set PATH so it includes user's private bin if it exists. "Prepends"
+if [ -d "$HOME/bin" ]
+then
+    export PATH="$HOME/bin:$PATH"
+fi
 
-# add pip paths
-PATH="/usr/local/share/python:$PATH"
-PATH="/usr/local/share/npm/bin:$PATH"
-
-# -d returns true if the directory right after exists
-
-#/usr/bin/keychain -q $HOME/.ssh/id_rsa --host $USER
-#. $HOME/.keychain/${USER}-sh
-
-   test -r /sw/bin/init.sh && . /sw/bin/init.sh
+# {{{
+# Node Completion - Auto-generated, do not touch.
+shopt -s progcomp
+for f in $(command ls ~/.node-completion)
+do
+  f="$HOME/.node-completion/$f"
+  test -f "$f" && . "$f"
+done
+# }}}

@@ -1,4 +1,4 @@
-# ~/.bashrc: executed by bash(1) for non-login shells.
+# $HOME/.bashrc: executed by bash(1) for non-login shells.
 # see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
 # for examples
 
@@ -25,7 +25,8 @@ shopt -s checkwinsize
 #[ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
 
 # set variable identifying the chroot you work in (used in the prompt below)
-if [ -z "$debian_chroot" ] && [ -r /etc/debian_chroot ]; then
+if [ -z "$debian_chroot" ] && [ -r /etc/debian_chroot ]
+then
     debian_chroot=$(cat /etc/debian_chroot)
 fi
 
@@ -34,14 +35,16 @@ fi
 # should be on the output of commands, not on the prompt
 #force_color_prompt=yes
 
-if [ -n "$force_color_prompt" ]; then
-    if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then
-	# We have color support; assume it's compliant with Ecma-48
-	# (ISO/IEC-6429). (Lack of such support is extremely rare, and such
-	# a case would tend to support setf rather than setaf.)
-	color_prompt=yes
+if [ -n "$force_color_prompt" ]
+then
+    if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null
+    then
+        # We have color support; assume it's compliant with Ecma-48
+        # (ISO/IEC-6429). (Lack of such support is extremely rare, and such
+        # a case would tend to support setf rather than setaf.)
+        color_prompt=yes
     else
-	color_prompt=
+        color_prompt=
     fi
 fi
 
@@ -51,7 +54,8 @@ case "$TERM" in
     xterm-256color) color_prompt=yes;;
 esac
 
-if [ "$color_prompt" = yes ]; then
+if [ "$color_prompt" = yes ]
+then
     # shortens bash prompt
     PS1='\[\033[01;32m\]r\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
 else
@@ -61,16 +65,18 @@ unset color_prompt force_color_prompt
 
 # If this is an xterm set the title to user@host:dir
 case "$TERM" in
-xterm*|rxvt*)
-    PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u: \w\a\]$PS1"
-    ;;
-*)
-    ;;
+    xterm*|rxvt*)
+        PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u: \w\a\]$PS1"
+        ;;
+    *)
+        ;;
 esac
 
 # enable color support of ls and also add handy aliases
-if [ -x /usr/bin/dircolors ]; then
-    test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
+# only on linux
+if [ -x /usr/bin/dircolors ]
+then
+    test -r $HOME/.dircolors && eval "$(dircolors -b $HOME/.dircolors)" || eval "$(dircolors -b)"
     alias ls='ls --color=auto'
 
     alias grep='grep --color=auto'
@@ -78,43 +84,31 @@ if [ -x /usr/bin/dircolors ]; then
     alias egrep='egrep --color=auto'
 fi
 
-# some more ls aliases
-alias ll='ls -alF'
-alias la='ls -A'
-alias l='ls -CF'
-alias ls='ls -G'
-
 # Alias definitions.
 # You may want to put all your additions into a separate file like
-# ~/.bash_aliases, instead of adding them here directly.
+# $HOME/.bash_aliases, instead of adding them here directly.
 # See /usr/share/doc/bash-doc/examples in the bash-doc package.
-
-if [ -f ~/.bash_aliases ]; then
-    . ~/.bash_aliases
+if [ -f $HOME/.bash_aliases ]
+then
+    . $HOME/.bash_aliases
 fi
 
 
 # enable programmable completion features (you don't need to enable
 # this, if it's already enabled in /etc/bash.bashrc and /etc/profile
 # sources /etc/bash.bashrc).
-if [ -f /etc/bash_completion ] && ! shopt -oq posix; then
+if [ -f /etc/bash_completion ] && ! shopt -oq posix
+then
     . /etc/bash_completion
 fi
-
-# alias open='gnome-open'
-alias uncut='cut --complement'
-
-# alias to run matlab from the shell
-alias matlab='matlab -nodesktop'
 
 # alias to open up chrome
 alias chrome='open -a Google\ Chrome'
 
 # alias to start tor
-alias tor='/Applications/TorBrowser_en-US.app/Contents/MacOS/tor &'
+alias tor='/Applications/TorBrowser_en-US.app/Contents/MacOS/tor'
 
 # alias for anonymous browsing
-#alias torchrome='chrome --proxy-server="socks=127.0.0.1:9050;sock4=127.0.0.1:9050;sock5=127.0.0.1:9050" --incognito check.torproject.org &'
 alias torchrome='chrome --args --proxy-server="socks=127.0.0.1:9050;sock4=127.0.0.1:9050;sock5=127.0.0.1:9050" --incognito check.torproject.org &'
 
 # make less do syntax highlighting
@@ -133,40 +127,38 @@ alias imagej='open -a ImageJ'
 # QuickLook alias
 alias prev='qlmanage -p'
 
-# privoxy alias
-alias privoxy='/usr/local/Cellar/privoxy/3.0.21/sbin/privoxy /usr/local/etc/privoxy/config'
-
-alias tree='tree -C'
-
-# alias for smart emacs launching function
-alias emacs='emacssmart'
-alias emacskill="emacsclient -e '(kill-emacs)' && echo 'killing emacs'"
-
-# emacssmart checks to see if there is more than one emacs process
-# ie: if there's a daemon and a frame
-# if true, it opens a new emacs frame with the file
+# checks if there is an emacs daemon running: yes - open a client with the file, no -
+# start a daemon, open client
+#
 # did this because i only use emacs in terminal and dont want
 # emacsclient <file_name> to open file in an open frame
+#
+# caution: even though all arguments passed via `${@:1}`, `emacsclient` only opens
+# one file, unlike `emacs`
+#
+# excluding `grep` from `ps`: http://superuser.com/questions/409655/excluding-grep-from-process-list
+# mass arguments: http://wiki.bash-hackers.org/scripting/posparams#mass_usage
 function emacssmart {
-    if [ "$(pgrep emacs | wc -l)" -ge 1 ]
+    # `ps -e` - print all processes
+    # `grep '[e]macs --daemon'` - greps out matching processes except itself
+    if [[ $(ps -e | grep '[e]macs --daemon') ]]
     then
-	    emacsclient -c $1
-    elif [ ! $(pgrep emacs) ]
-    then
-	    if [ -z "$1" ]
-	then 
-	        \emacs --daemon; emacssmart
-	    else
-	        \emacs --daemon; emacssmart $1
-	    fi
+        # if daemon is running
+        emacsclient -nw -c ${@:1} # windowless client, new one, pass all args (but
+                                  # only one file will open)
+    else
+        # no daemon
+        \emacs --daemon; emacssmart ${@:1} # start daemon, recursively call
+                                           # self. fuck performance
     fi
 }
 
-# launches emacs on new window
-if [[ ! $(pgrep emacs) ]]
-then
-    \emacs --daemon
-fi
+# # UNCOMMENT FOR EMACS DAEMON ON LOGIN
+# # launches emacs on login
+# if [[ ! $(ps -e | grep '[e]macs --daemon') ]]
+# then
+#     \emacs --daemon
+# fi
 
 # make directory, cd in
 function mkcd {
@@ -178,20 +170,35 @@ function mkcd {
     fi
 }
 
-# for virtualenv shit
-source /usr/local/bin/virtualenvwrapper.sh
+## htop by cpu usage
+alias monitor="sudo htop --sort-key PERCENT_CPU"
+
+alias CELLAR=/usr/local/Cellar
+
+# for python virtualenv shit
+# source /usr/local/bin/virtualenvwrapper.sh
 
 # ruby ish
 # not my favorite way to have ruby, but maintains most recent version
-export PATH="$HOME/.rbenv/bin:$PATH"
+export PATH=$HOME/.rbenv/bin:$PATH
 eval "$(rbenv init -)"
 
 # git auto complete
 source /usr/local/etc/bash_completion.d/git-completion.bash
-export GOPATH=~/code/go
+
+# go things
+export GOPATH=$HOME/code/go
+export PATH=$GOPATH/bin:$PATH
+export GOROOT=$CELLAR/go/1.3/libexec
+export PATH=$PATH:$GOROOT/bin
+export CGO_ENABLED=0
+source /usr/local/etc/bash_completion.d/go-completion.bash
 
 # node env
 export NODE_ENV=development
 
-# for searching node packages
-alias ngrep="grep -Hirs --exclude-dir=node_modules --exclude-dir=.build --exclude-dir='./public/components'"
+export PATH=$HOME/bowery/bin:$PATH
+
+#alias bowery_dev='API_ADDR=10.0.0.15:3000 BROOME_ADDR=127.0.0.1:4000 ENV=development bowery'
+alias bowery_dev='ENV=development bowery'
+alias crosby_dev='ENV=development crosby'

@@ -27,5 +27,7 @@ alias emacskill="pkill emacsclient; emacsclient -e '(kill-emacs)' && echo 'kille
 
 # for searching node packages
 # excludes tons-o-shit
-alias node_grep="grep --exclude-dir=node_modules --exclude-dir=.build --exclude-dir='./public/components'"
+alias node_grep="grep --exclude-dir=node_modules \
+                      --exclude-dir=.build \
+                      --exclude-dir='./public/components'"
 

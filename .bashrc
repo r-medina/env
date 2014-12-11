@@ -138,9 +138,9 @@ alias imagej='open -a ImageJ'
 alias prev='qlmanage -p'
 
 ## htop by cpu usage
-alias monitor="sudo htop --sort-key PERCENT_CPU"
+alias monitor='sudo htop --sort-key PERCENT_CPU'
 
-alias CELLAR=/usr/local/Cellar
+CELLAR='/usr/local/Cellar'
 
 # for python virtualenv shit
 source /usr/local/bin/virtualenvwrapper.sh
@@ -153,14 +153,17 @@ eval "$(rbenv init -)"
 # git auto complete
 source /usr/local/etc/bash_completion.d/git-completion.bash
 
-# go things
+# go things. it should be installed
+GOVER=$(go version | grep -o '[0-9]\+\(\.[0-9]\+\)\+') # matches one or more numbers
+                                                       # followed by one or more
+                                                       # dot-then-numbers. i.e 12.3.45
 export GOPATH=$HOME/code/go
 export PATH=$GOPATH/bin:$PATH
-export GOROOT=$CELLAR/go/1.3/libexec
+export GOROOT=$CELLAR/go/$GOVER/libexec
 export PATH=$PATH:$GOROOT/bin
 export CGO_ENABLED=0
-source /usr/local/etc/bash_completion.d/go-completion.bash
 
+# bowery path
 export PATH=$HOME/bowery/bin:$PATH
 
 #alias bowery_dev='API_ADDR=10.0.0.15:3000 BROOME_ADDR=127.0.0.1:4000 ENV=development bowery'

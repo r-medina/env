@@ -31,3 +31,5 @@ alias node_grep="grep --exclude-dir=node_modules \
                       --exclude-dir=.build \
                       --exclude-dir='./public/components'"
 
+# new ssh tunnel to server
+alias sshn='ssh -S none'

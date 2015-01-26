@@ -72,8 +72,10 @@ fi
 # caution: even though all arguments passed via `${@:1}`, `emacsclient` only opens
 # one file, unlike `emacs`
 #
-# excluding `grep` from `ps`: http://superuser.com/questions/409655/excluding-grep-from-process-list
-# mass arguments: http://wiki.bash-hackers.org/scripting/posparams#mass_usage
+# excluding `grep` from `ps`:
+#     http://superuser.com/questions/409655/excluding-grep-from-process-list
+# mass arguments:
+#     http://wiki.bash-hackers.org/scripting/posparams#mass_usage
 function emacssmart {
     # `ps -e` - print all processes
     # `grep '[e]macs --daemon'` - greps out matching processes except itself
@@ -82,19 +84,21 @@ function emacssmart {
         # if daemon is running
         emacsclient -nw -c ${@:1} # windowless client, new one, pass all args (but
                                   # only one file will open)
-    else
-        # no daemon
-        \emacs --daemon; emacssmart ${@:1} # start daemon, recursively call
-                                           # self. fuck performance
+    else # no daemon
+        pushd .
+        cd $HOME # just makes everything better
+        \emacs --daemon
+        popd
+        # start daemon, recursively call self. fuck performance
+        emacssmart ${@:1}
     fi
 }
 
-# # UNCOMMENT FOR EMACS DAEMON ON LOGIN
-# # launches emacs on login
-# if [[ ! $(ps -e | grep '[e]macs --daemon') ]]
-# then
-#     \emacs --daemon
-# fi
+# launches emacs on login
+if [[ ! $(ps -e | grep '[e]macs --daemon') ]]
+then
+    \emacs --daemon 1>.emacs.d/init.log 2>&1
+fi
 
 # make directory, cd in
 function mkcd {

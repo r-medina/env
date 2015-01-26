@@ -16,7 +16,7 @@ shopt -s histappend
 export HISTSIZE=
 export HISTFILESIZE=
 # appends history after each command
-export PROMPT_COMMAND="history -a; $PROMPT_COMMAND"
+PROMPT_COMMAND="history -a; $PROMPT_COMMAND"
 
 # check the window size after each command and, if necessary,
 # update the values of LINES and COLUMNS.
@@ -85,10 +85,7 @@ function emacssmart {
         emacsclient -nw -c ${@:1} # windowless client, new one, pass all args (but
                                   # only one file will open)
     else # no daemon
-        pushd .
-        cd $HOME # just makes everything better
-        \emacs --daemon
-        popd
+        \emacs --daemon --chdir $HOME
         # start daemon, recursively call self. fuck performance
         emacssmart ${@:1}
     fi
@@ -97,7 +94,7 @@ function emacssmart {
 # launches emacs on login
 if [[ ! $(ps -e | grep '[e]macs --daemon') ]]
 then
-    \emacs --daemon 1>.emacs.d/init.log 2>&1
+    \emacs --daemon --chdir $HOME 1>$HOME/.emacs.d/init.log 2>&1
 fi
 
 # make directory, cd in
@@ -151,7 +148,7 @@ source /usr/local/bin/virtualenvwrapper.sh
 
 # ruby ish
 # not my favorite way to have ruby, but maintains most recent version
-export PATH=$HOME/.rbenv/bin:$PATH
+PATH=$HOME/.rbenv/bin:$PATH
 eval "$(rbenv init -)"
 
 # git auto complete
@@ -162,13 +159,12 @@ GOVER=$(go version | grep -o '[0-9]\+\(\.[0-9]\+\)\+') # matches one or more num
                                                        # followed by one or more
                                                        # dot-then-numbers. i.e 12.3.45
 export GOPATH=$HOME/code/go
-export PATH=$GOPATH/bin:$PATH
+PATH=$GOPATH/bin:$PATH
 export GOROOT=$CELLAR/go/$GOVER/libexec
-export PATH=$PATH:$GOROOT/bin
+PATH=$PATH:$GOROOT/bin
 export CGO_ENABLED=0
 
-# bowery path
-export PATH=$HOME/bowery/bin:$PATH
+PATH=$HOME/bowery/bin:$PATH
 
 #alias bowery_dev='API_ADDR=10.0.0.15:3000 BROOME_ADDR=127.0.0.1:4000 ENV=development bowery'
 alias bowery_dev='ENV=development bowery'

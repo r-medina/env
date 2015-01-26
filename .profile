@@ -15,7 +15,7 @@ export EDITOR='emacs'
 
 if [ -d "/usr/local/sbin" ]
 then
-    export PATH="/usr/local/sbin:$PATH"
+    PATH="/usr/local/sbin:$PATH"
 fi
 
 # if running bash
@@ -31,7 +31,7 @@ fi
 # set PATH so it includes user's private bin if it exists. "Prepends"
 if [ -d "$HOME/bin" ]
 then
-    export PATH="$HOME/bin:$PATH"
+    PATH="$HOME/bin:$PATH"
 fi
 
 # {{{

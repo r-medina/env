@@ -79,7 +79,7 @@ fi
 function emacssmart {
     # `ps -e` - print all processes
     # `grep '[e]macs --daemon'` - greps out matching processes except itself
-    if [[ $(ps -e | grep '[e]macs --daemon') ]]
+    if [[ $(ps -e | grep '[E]macs .* --daemon') ]]
     then
         # if daemon is running
         emacsclient -nw -c ${@:1} # windowless client, new one, pass all args (but
@@ -91,11 +91,11 @@ function emacssmart {
     fi
 }
 
-# launches emacs on login
-if [[ ! $(ps -e | grep '[e]macs --daemon') ]]
-then
-    \emacs --daemon --chdir $HOME 1>$HOME/.emacs.d/init.log 2>&1
-fi
+# # launches emacs on login
+# if [[ ! $(ps -e | grep '[E]macs --daemon') ]]
+# then
+#     \emacs --daemon --chdir $HOME 1>$HOME/.emacs.d/init.log 2>&1
+# fi
 
 # make directory, cd in
 function mkcd {
@@ -169,3 +169,8 @@ PATH=$HOME/bowery/bin:$PATH
 #alias bowery_dev='API_ADDR=10.0.0.15:3000 BROOME_ADDR=127.0.0.1:4000 ENV=development bowery'
 alias bowery_dev='ENV=development bowery'
 alias crosby_dev='ENV=development crosby'
+
+
+export DOCKER_TLS_VERIFY=1
+export DOCKER_HOST=tcp://192.168.59.103:2376
+export DOCKER_CERT_PATH=/Users/ricky/.boot2docker/certs/boot2docker-vm

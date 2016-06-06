@@ -8,7 +8,7 @@
 # for ssh logins, install and configure the libpam-umask package.
 # umask 077
 
-export EDITOR='emacs'
+export EDITOR='\emacs -nw -q'
 
 # -n returns true if the string is not null
 # -f returns true if the file right after exists

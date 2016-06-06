@@ -12,6 +12,9 @@ export HISTCONTROL=ignoreboth
 # append to the history file, don't overwrite it
 shopt -s histappend
 
+# cd into dir with just its name # doesn't work on os x bc bash 3
+shopt -s autocd
+
 # for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
 export HISTSIZE=
 export HISTFILESIZE=
@@ -54,7 +57,6 @@ then
     . $HOME/.bash_aliases
 fi
 
-# idk
 # enable programmable completion features (you don't need to enable
 # this, if it's already enabled in /etc/bash.bashrc and /etc/profile
 # sources /etc/bash.bashrc).
@@ -117,14 +119,18 @@ export NODE_ENV=development
 export LESSOPEN="| /usr/local/bin/src-hilite-lesspipe.sh %s"
 export LESS=' -R '
 
+apps="/Applications"
+
 # alias to open up chrome
-alias chrome='open -a Google\ Chrome'
+CHROME='Google Chrome Canary'
+alias chrome="open -a \"${CHROME}\""
 
-# alias to start tor
-alias tor='/Applications/TorBrowser_en-US.app/Contents/MacOS/tor'
 
-# alias for anonymous browsing
-alias torchrome='chrome --args --proxy-server="socks=127.0.0.1:9050;sock4=127.0.0.1:9050;sock5=127.0.0.1:9050" --incognito check.torproject.org &'
+# # alias to start tor
+# alias tor='/Applications/TorBrowser_en-US.app/Contents/MacOS/tor'
+
+# # alias for anonymous browsing
+# alias torchrome='chrome --args --proxy-server="socks=127.0.0.1:9050;sock4=127.0.0.1:9050;sock5=127.0.0.1:9050" --incognito check.torproject.org &'
 
 # open ableton
 alias ableton='open -a Ableton\ Live\ 8'
@@ -138,13 +144,13 @@ alias imagej='open -a ImageJ'
 # QuickLook alias
 alias prev='qlmanage -p'
 
-## htop by cpu usage
+# htop by cpu usage
 alias monitor='sudo htop --sort-key PERCENT_CPU'
 
 CELLAR='/usr/local/Cellar'
 
 # for python virtualenv shit
-source /usr/local/bin/virtualenvwrapper.sh
+# source /usr/local/bin/virtualenvwrapper.sh
 
 # ruby ish
 # not my favorite way to have ruby, but maintains most recent version
@@ -159,18 +165,50 @@ GOVER=$(go version | grep -o '[0-9]\+\(\.[0-9]\+\)\+') # matches one or more num
                                                        # followed by one or more
                                                        # dot-then-numbers. i.e 12.3.45
 export GOPATH=$HOME/code/go
-PATH=$GOPATH/bin:$PATH
+PATH=$PATH:$GOPATH/bin
 export GOROOT=$CELLAR/go/$GOVER/libexec
 PATH=$PATH:$GOROOT/bin
-export CGO_ENABLED=0
+# export CGO_ENABLED=0
+export GOMAXPROCS=8
 
-PATH=$HOME/bowery/bin:$PATH
+# VMware Fusion
+# if [ -d "/Applications/VMware Fusion.app/Contents/Library" ]; then
+#     PATH=$PATH:"/Applications/VMware Fusion.app/Contents/Library"
+# fi
 
-#alias bowery_dev='API_ADDR=10.0.0.15:3000 BROOME_ADDR=127.0.0.1:4000 ENV=development bowery'
-alias bowery_dev='ENV=development bowery'
-alias crosby_dev='ENV=development crosby'
+# # docker shiz
+# export DOCKER_HOST=tcp://192.168.59.103:2376
+# #tcp://192.168.99.100:2376
+# export DOCKER_CERT_PATH=/Users/ricky/.boot2docker/certs/boot2docker-vm
+# #/Users/ricky/.docker/machine/machines/default # docker-machine
+# export DOCKER_TLS_VERIFY=1
 
+# The next line updates PATH for the Google Cloud SDK.
+source '/Users/ricky/code/google-cloud-sdk/path.bash.inc'
 
+# The next line enables bash completion for gcloud.
+source '/Users/ricky/code/google-cloud-sdk/completion.bash.inc'
+PATH=$PATH:$HOME/code/go/go_appengine
+
+DOPATH=~/DigitalOcean
+
+function do_init {
+    docker-start || { return 1; }
+
+    cd $DOPATH/cthulhu && source .env.sh && export DOPATH || { return 1; }
+
+    cd $DOPATH
+}
+
+export DOCKER_HOST=tcp://192.168.99.100:2376
+export DOCKER_MACHINE_NAME=default
 export DOCKER_TLS_VERIFY=1
-export DOCKER_HOST=tcp://192.168.59.103:2376
-export DOCKER_CERT_PATH=/Users/ricky/.boot2docker/certs/boot2docker-vm
+export DOCKER_CERT_PATH=/Users/ricky/.docker/machine/machines/default
+
+PATH=$PATH:$HOME/bowery/bin
+
+PATH="/Users/ricky/perl5/bin${PATH+:}${PATH}"; export PATH;
+PERL5LIB="/Users/ricky/perl5/lib/perl5${PERL5LIB+:}${PERL5LIB}"; export PERL5LIB;
+PERL_LOCAL_LIB_ROOT="/Users/ricky/perl5${PERL_LOCAL_LIB_ROOT+:}${PERL_LOCAL_LIB_ROOT}"; export PERL_LOCAL_LIB_ROOT;
+PERL_MB_OPT="--install_base \"/Users/ricky/perl5\""; export PERL_MB_OPT;
+PERL_MM_OPT="INSTALL_BASE=/Users/ricky/perl5"; export PERL_MM_OPT;

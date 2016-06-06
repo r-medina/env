@@ -25,6 +25,9 @@ alias emacs='emacssmart'
 # needs `;` after first command because pkill returns 1 if no processes
 alias emacskill="pkill emacsclient; emacsclient -e '(kill-emacs)' && echo 'killed emacs daemon'"
 
+# for finding a string in a directory
+alias dir_grep="grep -HIrsn --exclude-dir=.git"
+
 # for searching node packages
 # excludes tons-o-shit
 alias node_grep="grep --exclude-dir=node_modules \
